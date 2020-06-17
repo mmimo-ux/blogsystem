@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="_fragments :: head(~{::title})">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>博客游客注册</title>
+     
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" href="../../static/css/me.css">
+</head>
+<body>
+<br><br><br>
+<div class="m-container-small m-padded-tb-massive" style="max-width: 30em !important;">
+    <div class="ui container">
+        <div class="ui middle aligned center aligned grid">
+            <div class="column">
+                <h2 class="ui teal image header">
+                    <div class="content">
+                        游客注册
+                    </div>
+                </h2>
+                <form class="ui large form" method="post" action="#" th:action="@{/tourist/register}">
+                    <div class="ui segment">
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="user icon"></i>
+                                <input type="text" id="username" name="username" placeholder="用户名"
+                                       onchange="isUsernameUnique(this)">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="lock icon"></i>
+                                <input type="password" name="password" placeholder="密码">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="mail icon"></i>
+                                <input type="text" name="email" id="email" placeholder="邮箱">
+                            </div>
+                        </div>
+                        <button class="ui fluid large teal submit button" id="register-btn">注 册</button>
+                    </div>
+                    <div id="isRepeat"></div>
+                    <div class="ui error mini message"></div>
+
+                </form>
+
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!--/*/<th:block th:replace="admin/_fragments :: script">/*/-->
+<script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<!--/*/</th:block>/*/-->
+<script>
+    $('.ui.form').form({
+        fields: {
+            username: {
+                identifier: 'username',
+                rules: [{
+                    type: 'empty',
+                    prompt: '请输入用户名'
+                }]
+
+            },
+            password: {
+                identifier: 'password',
+                rules: [{
+                    type: 'length[6]',
+                    prompt: '密码必须至少6个字符'
+                }]
+
+            },
+            typeId: {
+                identifier: 'email',
+                rules: [{
+                    type: 'email',
+                    prompt: '请输入正确格式的邮箱'
+                }]
+
+            }
+        }
+    });
+
+    //判断用户名的唯一性
+    function isUsernameUnique(a) {
+        //获取页面输入框输入的用户名
+        var username = $("#username").val();
+        //请求controller判断用户名的唯一性
+        $.ajax({
+            //url路径
+            url: "http://localhost:8080/tourist/isUsernameUnique",
+            //data请求数据
+            data: {"username": username},
+            //dataType json
+            type: "post",
+            //回调函数
+            success: function (data) {
+                //回调函数 data 返回流
+                if (data == "false") {
+                    //如果返回false不可使用
+                    //提示用户已存在 ----设置文本框改成红色  宽度为1  样式实线
+                    $("#username").attr("style", "border:red 1px solid");
+                    //  $("#isRepeat").html("该用户名已被使用");
+                    $("#register-btn").prop("disabled", true);
+                } else {
+                    //如果返回的是true    则设置保存按钮可用  恢复原来的样式  文本框还原
+                    $("#username").attr("style", "");
+                    $("#register-btn").prop("disabled", false);
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>
